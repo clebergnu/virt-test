@@ -719,9 +719,17 @@ class UnattendedInstallConfig(object):
             else:
                 # Windows unattended install
                 dest_fname = "autounattend.xml"
-                boot_disk = utils_disk.FloppyDisk(self.floppy,
-                                                  self.qemu_img_binary,
-                                                  self.tmpdir, self.vfd_size)
+
+                if self.params.get('unattended_delivery_method') == 'cdrom':
+                    boot_disk = utils_disk.CdromDisk(self.cdrom_unattended,
+                                                     self.tmpdir)
+
+                else:
+                    logging.info('Falling back to floppy as unattended '
+                                 'delivery method')
+                    boot_disk = utils_disk.FloppyDisk(self.floppy,
+                                                      self.qemu_img_binary,
+                                                      self.tmpdir, self.vfd_size)
                 answer_path = boot_disk.get_answer_file_path(dest_fname)
                 self.answer_windows_xml(answer_path)
 
